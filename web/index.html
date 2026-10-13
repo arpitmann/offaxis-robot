@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#3a70ba">
+<meta name="mobile-web-app-capable" content="yes">
+<title>My Robot</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<style>
+  :root { --ink: #1e2a3a; --cyan: #50e6ff; --pink: #ff508c; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #3a70ba; touch-action: none;
+               font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-user-select: none; user-select: none; }
+  canvas#view { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+  #start { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+           gap: 18px; background: radial-gradient(circle at 50% 35%, #5d8fd0, #233c63); color: white; text-align: center; padding: 24px; box-sizing: border-box; z-index: 10; }
+  #start h1 { margin: 0; font-size: 34px; letter-spacing: 0.5px; }
+  #start p { margin: 0; max-width: 340px; line-height: 1.45; opacity: 0.92; font-size: 16px; }
+  #go { margin-top: 10px; border: 0; border-radius: 999px; padding: 18px 42px; font-size: 21px; font-weight: 700;
+        background: white; color: var(--ink); box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+  #go:active { transform: scale(0.97); }
+  #status { min-height: 1.4em; font-size: 15px; opacity: 0.9; }
+  #face { width: 120px; height: 120px; }
+  #bubble { position: fixed; left: 0; top: 0; z-index: 5; pointer-events: none; transform-origin: 50% 100%;
+            background: rgba(255,255,255,0.93); color: var(--ink); font-weight: 800; font-size: clamp(18px, 4.6vw, 30px);
+            padding: 10px 20px; border-radius: 999px; white-space: nowrap; display: none; box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+            transform: translate(-50%, -100%); }
+  #bubble::after { content: ""; position: absolute; left: 50%; bottom: -12px; margin-left: -11px;
+                   border: 11px solid transparent; border-top-color: rgba(255,255,255,0.93); border-bottom: 0; }
+  #bubble.pop { animation: pop 0.3s ease-out; }
+  @keyframes pop { 0% { transform: translate(-50%, -100%) scale(0.6); } 60% { transform: translate(-50%, -100%) scale(1.08); } 100% { transform: translate(-50%, -100%) scale(1); } }
+  #dbgbtn { position: fixed; right: 12px; top: calc(12px + env(safe-area-inset-top)); z-index: 6; width: 40px; height: 40px;
+            border-radius: 50%; border: 0; background: rgba(0,0,0,0.25); color: white; font-size: 18px; display: none; }
+  #guitarbtn { position: fixed; right: calc(16px + env(safe-area-inset-right)); bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 6;
+               width: 68px; height: 68px; border-radius: 50%; border: 0; background: rgba(255,255,255,0.92); font-size: 34px;
+               box-shadow: 0 6px 18px rgba(0,0,0,0.25); display: none; }
+  #guitarbtn:active { transform: scale(0.93); }
+  #debug { position: fixed; left: 10px; top: calc(10px + env(safe-area-inset-top)); z-index: 6; display: none; color: white;
+           font: 12px/1.35 ui-monospace, monospace; max-width: 70vw; }
+  #debug canvas { width: 160px; border: 1px solid white; display: block; }
+  #debug div { background: rgba(0,0,0,0.6); padding: 4px 6px; margin-top: 4px; white-space: pre-wrap; }
+  #toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 7;
+           background: rgba(0,0,0,0.6); color: white; padding: 8px 14px; border-radius: 12px; font-size: 14px; display: none; text-align: center; max-width: 90vw; }
+</style>
+</head>
+<body>
+<canvas id="view"></canvas>
+<div id="bubble"></div>
+<button id="dbgbtn" aria-label="Show what the camera sees">👁</button>
+<button id="guitarbtn" aria-label="Play the song">🎸</button>
+<div id="debug"><canvas id="dbgcam" width="160" height="120"></canvas><div id="dbgtxt"></div></div>
+<div id="toast"></div>
+<div id="start">
+  <svg id="face" viewBox="0 0 120 120" aria-hidden="true">
+    <rect x="57" y="4" width="6" height="18" fill="#62687a"/><rect x="52" y="0" width="16" height="12" rx="2" fill="#ff3c3c"/>
+    <rect x="12" y="20" width="96" height="84" rx="10" fill="#afb6c2"/>
+    <rect x="30" y="44" width="22" height="22" rx="3" fill="#50e6ff"/><rect x="68" y="44" width="22" height="22" rx="3" fill="#50e6ff"/>
+    <path d="M38 80 Q60 96 82 80" stroke="#283040" stroke-width="6" fill="none" stroke-linecap="round"/>
+  </svg>
+  <h1>Meet your robot</h1>
+  <p>It lives inside your screen and copies everything you do. Move your head to look around its world.</p>
+  <button id="go">Tap to start</button>
+  <div id="status"></div>
+</div>
+<script type="module" src="app.js"></script>
+<script>
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || ['localhost', '127.0.0.1'].includes(location.hostname))) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+</script>
+</body>
+</html>
