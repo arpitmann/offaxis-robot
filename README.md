@@ -2,7 +2,7 @@
 
 **A little robot that lives *inside* your screen.** Move your head and the screen acts like a real window into its 3D world. The robot turns to look at you and copies your face, hands and whole body in real time. Everything runs from your webcam: no special hardware, no app store.
 
-### ▶ [Try it in your browser](https://YOUR-USERNAME.github.io/offaxis-robot/)
+### ▶ [Try it in your browser](https://arpitmann.github.io/offaxis-robot/)
 Works on Android, iPhone, and laptops. Tap **Start**, allow the camera, then move your head.
 
 ![The robot playing guitar](screenshots/guitar.jpg)
